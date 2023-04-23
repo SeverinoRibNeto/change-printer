@@ -1,0 +1,8 @@
+
+#Pasta ambiente virtual
+venv
+.pytest_cache
+__pycache__
+
+#Arquivo
+tempo
