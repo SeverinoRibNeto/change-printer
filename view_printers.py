@@ -9,6 +9,7 @@
 
 import wx
 import wx.xrc
+import pubsub
 
 ###########################################################################
 # Class MyFrame1
