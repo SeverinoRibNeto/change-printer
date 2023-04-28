@@ -158,16 +158,16 @@ class GUI (wx.Frame):
 
     # Virtual event handlers, override them in your derived class
     def saveConfig(self, event):
-        print("Save")
         pub.sendMessage("Save_Config_Pressed")
+        event.Skip()
 
     def loadConfig(self, event):
-        print("Load")
         pub.sendMessage("Load_Config_Pressed")
+        event.Skip()
 
     def start(self, event):
-        print("Start")
         pub.sendMessage("Start_Pressed")
+        event.Skip()
 
 
 if __name__ == '__main__':
