@@ -9,21 +9,63 @@
 
 import wx
 import wx.xrc
-import pubsub
+from wx.adv import TaskBarIcon as TaskBarIcon
+from pubsub import pub
+import pystray
+
 
 ###########################################################################
-# Class MyFrame1
+# Class TaskBar
+###########################################################################
+class TaskBar(TaskBarIcon):
+    def __init__(self, frame):
+        TaskBarIcon.__init__(self)
+        self.frame = frame
+        self.SetIcon(wx.Icon('change-printer.png', wx.BITMAP_TYPE_PNG), 'Task bar icon')
+
+        #----------------------------------------------------------------
+        self.Bind(wx.EVT_MENU, self.OnTaskBarActivate, id=1)
+        self.Bind(wx.EVT_MENU, self.OnTaskBarDeactivate, id=2)
+        self.Bind(wx.EVT_MENU, self.OnTaskBarClose, id=3)
+
+    def CreatePopupMenu(self):
+        menu = wx.Menu()
+        menu.Append(1, "Mostrar")
+        menu.Append(2, "Esconder")
+        menu.Append(3, "Fechar")
+        return menu
+    
+    def OnTaskBarActivate(self, event):
+        if (not self.frame.IsShown()):
+            self.frame.Show()
+
+    def OnTaskBarDeactivate(self, event):
+        if (self.frame.IsShown()):
+            self.frame.Hide()
+    
+    def OnTaskBarClose(self, event):
+        self.frame.Close()
+        
+        
+
+
+###########################################################################
+# Class GUI
 ###########################################################################
 
 
-class MyFrame1 (wx.Frame):
+class GUI (wx.Frame):
 
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=u"GIP",
                           pos=wx.DefaultPosition, size=wx.Size(722, 335),
                           style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
-
+        self.SetIcon(wx.Icon('change-printer.ico', wx.BITMAP_TYPE_ICO))
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
+        #----------------------------------------------------------------
+        self.tskic = TaskBar(self)
+        #----------------------------------------------------------------
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
 
         bSizer1 = wx.BoxSizer(wx.VERTICAL)
 
@@ -110,19 +152,26 @@ class MyFrame1 (wx.Frame):
     def __del__(self):
         pass
 
+    def OnClose(self, event):
+        self.tskic.Destroy()
+        self.Destroy()
+
     # Virtual event handlers, override them in your derived class
     def saveConfig(self, event):
-        event.Skip()
+        print("Save")
+        pub.sendMessage("Save_Config_Pressed")
 
     def loadConfig(self, event):
-        event.Skip()
+        print("Load")
+        pub.sendMessage("Load_Config_Pressed")
 
     def start(self, event):
-        event.Skip()
+        print("Start")
+        pub.sendMessage("Start_Pressed")
 
 
 if __name__ == '__main__':
     app = wx.App()
-    frame = MyFrame1(None)
+    frame = GUI(None)
     frame.Show()
     app.MainLoop()
