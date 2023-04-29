@@ -1,0 +1,2 @@
+caminho=C:\Program Files (x86)\Magebot\magebotv55.exe
+impressora=OneNote (Desktop)

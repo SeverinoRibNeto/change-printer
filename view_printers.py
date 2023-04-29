@@ -66,6 +66,15 @@ class GUI (wx.Frame):
         self.tskic = TaskBar(self)
         #----------------------------------------------------------------
         self.Bind(wx.EVT_CLOSE, self.OnClose)
+        #----------------------------------------------------------------
+        self.message_box_program = wx.MessageDialog(self, 
+                                       "Coloque o programa a ser usado pela impressora.", 
+                                       caption="Error",
+                                       style=wx.OK_DEFAULT|wx.CENTER)
+        self.message_box_printer= wx.MessageDialog(self, 
+                                       "Selecione a impressora padrão para o programa.", 
+                                       caption="Error",
+                                       style=wx.OK_DEFAULT|wx.CENTER)
 
         bSizer1 = wx.BoxSizer(wx.VERTICAL)
 
@@ -81,10 +90,10 @@ class GUI (wx.Frame):
         bSizer1.Add(self.m_staticText3, 0, wx.ALL |
                     wx.ALIGN_CENTER_HORIZONTAL, 5)
 
-        m_choice2Choices = [u"Selecione a impressora", wx.EmptyString]
+        self.m_choice2Choices = [u"Selecione a impressora", wx.EmptyString]
         self.m_choice2 = wx.Choice(
             self, wx.ID_ANY, wx.DefaultPosition,
-            wx.Size(300, -1), m_choice2Choices, 0)
+            wx.Size(300, -1), self.m_choice2Choices, 0)
         self.m_choice2.SetSelection(0)
         self.m_choice2.SetFont(wx.Font(
             14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL,
@@ -158,15 +167,34 @@ class GUI (wx.Frame):
 
     # Virtual event handlers, override them in your derived class
     def saveConfig(self, event):
-        pub.sendMessage("Save_Config_Pressed")
+        if not (self.m_choice2.GetStringSelection()):
+            self.message_box_printer.ShowModal()
+            return
+        
+        if not (self.m_filePicker1.GetPath()):
+            self.message_box_program.ShowModal()
+            return
+        pub.sendMessage("Save_Config_Pressed",
+                        caminho_processo=self.m_filePicker1.GetPath(), 
+                        impressora_selecionada=self.m_choice2.GetStringSelection())
         event.Skip()
 
     def loadConfig(self, event):
         pub.sendMessage("Load_Config_Pressed")
         event.Skip()
 
-    def start(self, event):
-        pub.sendMessage("Start_Pressed")
+    def start(self, event) -> None:
+        if not (self.m_choice2.GetStringSelection()):
+            self.message_box_printer.ShowModal()
+            return
+        
+        if not (self.m_filePicker1.GetPath()):
+            self.message_box_program.ShowModal()
+            return
+        
+        pub.sendMessage("Start_Pressed", 
+                        caminho_processo=self.m_filePicker1.GetPath(), 
+                        impressora_selecionada=self.m_choice2.GetStringSelection())
         event.Skip()
 
 
