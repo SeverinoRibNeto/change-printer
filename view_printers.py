@@ -214,6 +214,7 @@ class GUI (wx.Frame):
     
     
     def stop( self, event ):
+        pub.sendMessage("Stop_Pressed")
         event.Skip()
 
 
