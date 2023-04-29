@@ -123,40 +123,55 @@ class GUI (wx.Frame):
 
         bSizer1.Add((0, 0), 1, wx.EXPAND, 5)
 
-        gSizer1 = wx.GridSizer(1, 3, 0, 0)
+        gSizer1 = wx.GridSizer( 1, 4, 0, 0 )
 
-        self.saveConfBtn = wx.Button(
-            self, wx.ID_ANY, u"Salvar Configurações",
-            wx.DefaultPosition, wx.DefaultSize, 0)
-        self.saveConfBtn.SetMinSize(wx.Size(150, 40))
+        self.saveConfBtn = wx.Button( self, wx.ID_ANY, u"Salvar Configurações", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.saveConfBtn.SetMinSize( wx.Size( 150,40 ) )
 
-        gSizer1.Add(self.saveConfBtn, 0, wx.ALL, 5)
+        gSizer1.Add( self.saveConfBtn, 0, wx.ALL, 5 )
 
-        self.loadConfBtn = wx.Button(
-            self, wx.ID_ANY, u"Carregar Configuração",
-            wx.DefaultPosition, wx.DefaultSize, 0)
-        self.loadConfBtn.SetMinSize(wx.Size(150, 40))
+        self.loadConfBtn = wx.Button( self, wx.ID_ANY, u"Carregar Configuração", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.loadConfBtn.SetMinSize( wx.Size( 150,40 ) )
 
-        gSizer1.Add(self.loadConfBtn, 0, wx.ALL |
-                    wx.ALIGN_CENTER_HORIZONTAL, 5)
+        gSizer1.Add( self.loadConfBtn, 0, wx.ALL, 5 )
 
-        self.startBtn = wx.Button(
-            self, wx.ID_ANY, u"Iniciar", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.startBtn.SetMinSize(wx.Size(150, 40))
+        self.startBtn = wx.Button( self, wx.ID_ANY, u"Iniciar", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.startBtn.SetMinSize( wx.Size( 150,40 ) )
 
-        gSizer1.Add(self.startBtn, 0, wx.ALL | wx.ALIGN_RIGHT, 5)
+        gSizer1.Add( self.startBtn, 0, wx.ALL, 5 )
 
-        bSizer1.Add(gSizer1, 1, wx.EXPAND, 5)
+        self.pararBtn = wx.Button( self, wx.ID_ANY, u"Parar", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.pararBtn.SetMinSize( wx.Size( 150,40 ) )
 
-        self.SetSizer(bSizer1)
+        gSizer1.Add( self.pararBtn, 0, wx.ALL|wx.ALIGN_RIGHT, 5 )
+
+
+        bSizer1.Add( gSizer1, 0, wx.EXPAND, 5 )
+
+
+        bSizer1.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+
+        bSizer2 = wx.BoxSizer( wx.VERTICAL )
+
+        self.m_staticText31 = wx.StaticText( self, wx.ID_ANY, u"Programa Parado", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText31.Wrap( -1 )
+
+        bSizer2.Add( self.m_staticText31, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5 )
+
+
+        bSizer1.Add( bSizer2, 1, wx.EXPAND, 5 )
+
+
+        self.SetSizer( bSizer1 )
         self.Layout()
 
-        self.Centre(wx.BOTH)
+        self.Centre( wx.BOTH )
 
         # Connect Events
         self.saveConfBtn.Bind(wx.EVT_BUTTON, self.saveConfig)
         self.loadConfBtn.Bind(wx.EVT_BUTTON, self.loadConfig)
         self.startBtn.Bind(wx.EVT_BUTTON, self.start)
+        self.pararBtn.Bind( wx.EVT_BUTTON, self.stop )
 
     def __del__(self):
         pass
@@ -195,6 +210,10 @@ class GUI (wx.Frame):
         pub.sendMessage("Start_Pressed", 
                         caminho_processo=self.m_filePicker1.GetPath(), 
                         impressora_selecionada=self.m_choice2.GetStringSelection())
+        event.Skip()
+    
+    
+    def stop( self, event ):
         event.Skip()
 
 
