@@ -11,7 +11,6 @@ import wx
 import wx.xrc
 from wx.adv import TaskBarIcon as TaskBarIcon
 from pubsub import pub
-import pystray
 
 
 ###########################################################################
@@ -21,9 +20,10 @@ class TaskBar(TaskBarIcon):
     def __init__(self, frame):
         TaskBarIcon.__init__(self)
         self.frame = frame
-        self.SetIcon(wx.Icon('change-printer.png', wx.BITMAP_TYPE_PNG), 'Task bar icon')
+        self.SetIcon(wx.Icon('change-printer.png',
+                     wx.BITMAP_TYPE_PNG), 'Task bar icon')
 
-        #----------------------------------------------------------------
+        # ----------------------------------------------------------------
         self.Bind(wx.EVT_MENU, self.OnTaskBarActivate, id=1)
         self.Bind(wx.EVT_MENU, self.OnTaskBarDeactivate, id=2)
         self.Bind(wx.EVT_MENU, self.OnTaskBarClose, id=3)
@@ -38,7 +38,7 @@ class TaskBar(TaskBarIcon):
         menu.Append(4, "Iniciar")
         menu.Append(5, "Parar")
         return menu
-    
+
     def OnTaskBarActivate(self, event):
         if (not self.frame.IsShown()):
             self.frame.Show()
@@ -46,13 +46,13 @@ class TaskBar(TaskBarIcon):
     def OnTaskBarDeactivate(self, event):
         if (self.frame.IsShown()):
             self.frame.Hide()
-    
+
     def OnTaskBarClose(self, event):
         self.frame.Close()
-        
+
     def OnTaskBarStop(self, event):
         pub.sendMessage("Stop_Pressed")
-    
+
     def OnTaskBarStart(self, event):
         pub.sendMessage("Stop_Pressed")
 
@@ -68,21 +68,23 @@ class GUI (wx.Frame):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=u"GIP",
                           pos=wx.DefaultPosition, size=wx.Size(722, 335),
                           style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
-        self.SetIcon(wx.Icon('change-printer.ico', wx.BITMAP_TYPE_ICO))
+        self.SetIcon(wx.Icon('change-printer.png', wx.BITMAP_TYPE_PNG))
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
-        #----------------------------------------------------------------
+        # ----------------------------------------------------------------
         self.tskic = TaskBar(self)
-        #----------------------------------------------------------------
+        # ----------------------------------------------------------------
         self.Bind(wx.EVT_CLOSE, self.OnClose)
-        #----------------------------------------------------------------
-        self.message_box_program = wx.MessageDialog(self, 
-                                       "Coloque o programa a ser usado pela impressora.", 
-                                       caption="Error",
-                                       style=wx.OK_DEFAULT|wx.CENTER)
-        self.message_box_printer= wx.MessageDialog(self, 
-                                       "Selecione a impressora padrão para o programa.", 
-                                       caption="Error",
-                                       style=wx.OK_DEFAULT|wx.CENTER)
+        # ----------------------------------------------------------------
+        program_message = "Coloque o programa a ser usado pela impressora."
+        printer_message = "Selecione a impressora padrão para o programa."
+        self.message_box_program = wx.MessageDialog(self,
+                                                    program_message,
+                                                    caption="Error",
+                                                    style=wx.OK_DEFAULT)
+        self.message_box_printer = wx.MessageDialog(self,
+                                                    printer_message,
+                                                    caption="Error",
+                                                    style=wx.OK_DEFAULT)
 
         bSizer1 = wx.BoxSizer(wx.VERTICAL)
 
@@ -131,55 +133,65 @@ class GUI (wx.Frame):
 
         bSizer1.Add((0, 0), 1, wx.EXPAND, 5)
 
-        gSizer1 = wx.GridSizer( 1, 4, 0, 0 )
+        gSizer1 = wx.GridSizer(1, 4, 0, 0)
 
-        self.saveConfBtn = wx.Button( self, wx.ID_ANY, u"Salvar Configurações", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.saveConfBtn.SetMinSize( wx.Size( 150,40 ) )
+        self.saveConfBtn = wx.Button(
+            self, wx.ID_ANY,
+            u"Salvar Configurações",
+            wx.DefaultPosition, wx.DefaultSize, 0)
+        self.saveConfBtn.SetMinSize(wx.Size(150, 40))
 
-        gSizer1.Add( self.saveConfBtn, 0, wx.ALL, 5 )
+        gSizer1.Add(self.saveConfBtn, 0, wx.ALL, 5)
 
-        self.loadConfBtn = wx.Button( self, wx.ID_ANY, u"Carregar Configuração", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.loadConfBtn.SetMinSize( wx.Size( 150,40 ) )
+        self.loadConfBtn = wx.Button(
+            self, wx.ID_ANY,
+            u"Carregar Configuração",
+            wx.DefaultPosition,
+            wx.DefaultSize, 0)
+        self.loadConfBtn.SetMinSize(wx.Size(150, 40))
 
-        gSizer1.Add( self.loadConfBtn, 0, wx.ALL, 5 )
+        gSizer1.Add(self.loadConfBtn, 0, wx.ALL, 5)
 
-        self.startBtn = wx.Button( self, wx.ID_ANY, u"Iniciar", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.startBtn.SetMinSize( wx.Size( 150,40 ) )
+        self.startBtn = wx.Button(
+            self, wx.ID_ANY, u"Iniciar", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.startBtn.SetMinSize(wx.Size(150, 40))
 
-        gSizer1.Add( self.startBtn, 0, wx.ALL, 5 )
+        gSizer1.Add(self.startBtn, 0, wx.ALL, 5)
 
-        self.pararBtn = wx.Button( self, wx.ID_ANY, u"Parar", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.pararBtn.SetMinSize( wx.Size( 150,40 ) )
+        self.pararBtn = wx.Button(
+            self, wx.ID_ANY, u"Parar", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.pararBtn.SetMinSize(wx.Size(150, 40))
 
-        gSizer1.Add( self.pararBtn, 0, wx.ALL|wx.ALIGN_RIGHT, 5 )
+        gSizer1.Add(self.pararBtn, 0, wx.ALL | wx.ALIGN_RIGHT, 5)
 
+        bSizer1.Add(gSizer1, 0, wx.EXPAND, 5)
 
-        bSizer1.Add( gSizer1, 0, wx.EXPAND, 5 )
+        bSizer1.Add((0, 0), 1, wx.EXPAND, 5)
 
+        bSizer2 = wx.BoxSizer(wx.VERTICAL)
 
-        bSizer1.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+        self.m_staticText31 = wx.StaticText(
+            self, wx.ID_ANY,
+            u"Programa Parado",
+            wx.DefaultPosition,
+            wx.DefaultSize, 0)
+        self.m_staticText31.Wrap(-1)
 
-        bSizer2 = wx.BoxSizer( wx.VERTICAL )
+        bSizer2.Add(self.m_staticText31, 0, wx.ALL |
+                    wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 5)
 
-        self.m_staticText31 = wx.StaticText( self, wx.ID_ANY, u"Programa Parado", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText31.Wrap( -1 )
+        bSizer1.Add(bSizer2, 1, wx.EXPAND, 5)
 
-        bSizer2.Add( self.m_staticText31, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5 )
-
-
-        bSizer1.Add( bSizer2, 1, wx.EXPAND, 5 )
-
-
-        self.SetSizer( bSizer1 )
+        self.SetSizer(bSizer1)
         self.Layout()
 
-        self.Centre( wx.BOTH )
+        self.Centre(wx.BOTH)
 
         # Connect Events
         self.saveConfBtn.Bind(wx.EVT_BUTTON, self.saveConfig)
         self.loadConfBtn.Bind(wx.EVT_BUTTON, self.loadConfig)
         self.startBtn.Bind(wx.EVT_BUTTON, self.start)
-        self.pararBtn.Bind( wx.EVT_BUTTON, self.stop )
+        self.pararBtn.Bind(wx.EVT_BUTTON, self.stop)
 
     def __del__(self):
         pass
@@ -193,13 +205,13 @@ class GUI (wx.Frame):
         if not (self.m_choice2.GetStringSelection()):
             self.message_box_printer.ShowModal()
             return
-        
+
         if not (self.m_filePicker1.GetPath()):
             self.message_box_program.ShowModal()
             return
         pub.sendMessage("Save_Config_Pressed",
-                        caminho_processo=self.m_filePicker1.GetPath(), 
-                        impressora_selecionada=self.m_choice2.GetStringSelection())
+                        caminho=self.m_filePicker1.GetPath(),
+                        impressora=self.m_choice2.GetStringSelection())
         event.Skip()
 
     def loadConfig(self, event):
@@ -210,18 +222,17 @@ class GUI (wx.Frame):
         if not (self.m_choice2.GetStringSelection()):
             self.message_box_printer.ShowModal()
             return
-        
+
         if not (self.m_filePicker1.GetPath()):
             self.message_box_program.ShowModal()
             return
-        
-        pub.sendMessage("Start_Pressed", 
-                        caminho_processo=self.m_filePicker1.GetPath(), 
-                        impressora_selecionada=self.m_choice2.GetStringSelection())
+
+        pub.sendMessage("Start_Pressed",
+                        caminho=self.m_filePicker1.GetPath(),
+                        impressora=self.m_choice2.GetStringSelection())
         event.Skip()
-    
-    
-    def stop( self, event ):
+
+    def stop(self, event):
         pub.sendMessage("Stop_Pressed")
         event.Skip()
 
