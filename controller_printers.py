@@ -42,9 +42,10 @@ class PrinterController:
         self.frame.m_filePicker1.Disable()
 
     def start(self, caminho:str, impressora:str) -> bool:
+        #TODO: Implementar o looping de checagem de programa na model
         print("Start_Pressed - Controller")
-        self.frame.m_staticText31.SetLabelText(text="Programa em funcionamento")
-        self.running = True
+        self.frame.m_staticText31.SetLabelText(text="Programa em funcionamento")#Altera a label para mostrar o programa em funcionamento
+        self.running = True #Variavel para rodar o loop do programa
         print(impressora, caminho)
         return True
 
