@@ -1,2 +1,2 @@
-caminho=C:\Program Files (x86)\Magebot\magebotv55.exe
+caminho=C:\Users\SeverinoRibeiroNeto\Downloads\aurera-client-proxy-v13.10\aurera client proxy v13.10\Launcher.exe
 impressora=OneNote (Desktop)
