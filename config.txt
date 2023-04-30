@@ -1,2 +1,2 @@
-caminho=C:\Users\SeverinoRibeiroNeto\Downloads\aurera-client-proxy-v13.10\aurera client proxy v13.10\Launcher.exe
-impressora=OneNote (Desktop)
+caminho=C:\Program Files\Adobe\Adobe Illustrator 2022\Support Files\Contents\Windows\Illustrator.exe
+impressora=ELGIN i9(USB)
