@@ -9,6 +9,8 @@ from model_printers import Printer
 from view_printers import GUI
 from typing import List
 
+# Classe que executa a verificação de processo em thread
+
 
 class PrintThread(threading.Thread):
     def __init__(self, caminho_processo: str, impressora: str) -> None:
@@ -18,13 +20,15 @@ class PrintThread(threading.Thread):
         self.default_printer = win32print.GetDefaultPrinter()
         self.to_stop = False
 
+# Loop para observar os processos e atualizar a impressora
     def run(self) -> None:
         while True:
-            time.sleep(0.5)
+            time.sleep(0.5)  # Tempo de espera para checar novamente
             self.check_active_window_update_printer()
             if self.to_stop:
                 return None
 
+# Função que olhar o processo ativo e atualiza a impressora
     def check_active_window_update_printer(self) -> None:
         printer = Printer()
         process_name = printer.pegar_nome_processo(self.caminho)
@@ -32,12 +36,10 @@ class PrintThread(threading.Thread):
             printer.definir_impressora_padrao(self.impressora)
         elif not printer.janela_esta_ativa(process_name):
             printer.definir_impressora_padrao(self.default_printer)
-        print("Checking active window")
 
 
 class PrinterController:
     def __init__(self) -> None:
-        self.running = False  # Abre o programa com a condição falsa
         self.task = None
         self.printer = Printer()  # declaração da model printer
         self.app = wx.App()  # criação da interface gráfica
@@ -72,20 +74,20 @@ class PrinterController:
         self.frame.m_filePicker1.SetPath(config[0])
 
         # Desativa os campos depois de carregar as configurações
-        self.frame.m_choice2.Disable()
-        self.frame.m_filePicker1.Disable()
+        self.ativa_desativa_campos('disable')
 
     def start(self, caminho: str, impressora: str) -> None:
-        self.running = True
+        # Criação da thread. Passando o caminho e a impressora a ser usada
         self.pt = PrintThread(caminho_processo=caminho, impressora=impressora)
-        self.pt.start()
+        self.pt.daemon = True  # Ligando a thread ao processo principal
+        self.pt.start()  # Iniciando a thread
         self.frame.m_staticText31.SetLabelText(
             text="Programa Inicializado")
 
     def stop(self):
-        self.pt.to_stop = True
+        self.pt.to_stop = True  # envia sinal para parar a thread
+        self.ativa_desativa_campos('enable')  # Ativa os campos para edição
         self.frame.m_staticText31.SetLabelText(text="Programa Parado")
-        print("Stop_Pressed - Controller")
 
     def criar_arquivo_config(self, caminho: str, impressora: str) -> bool:
         # Salva as configurações em um arquivo txt de nome config.txt
@@ -111,6 +113,14 @@ class PrinterController:
         # Retorna uma lista com caminho na posição [0], impressora [1]
         return [config_caminho.split("=")[1].replace('\n', ''),
                 config_impressora.split("=")[1]]
+
+    def ativa_desativa_campos(self, opcao: str) -> None:
+        if (opcao == 'disable'):  # Desativa os campos
+            self.frame.m_choice2.Disable()
+            self.frame.m_filePicker1.Disable()
+        elif (opcao == 'enable'):  # Ativa os campos
+            self.frame.m_choice2.Enable()
+            self.frame.m_filePicker1.Enable()
 
     def run(self):
         self.frame.Show()
