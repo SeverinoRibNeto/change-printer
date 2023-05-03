@@ -6,7 +6,7 @@
 ##
 # PLEASE DO *NOT* EDIT THIS FILE!
 ###########################################################################
-
+import os
 import wx
 import wx.xrc
 from wx.adv import TaskBarIcon as TaskBarIcon
@@ -17,10 +17,10 @@ from pubsub import pub
 # Class TaskBar
 ###########################################################################
 class TaskBar(TaskBarIcon):
-    def __init__(self, frame):
+    def __init__(self, frame:wx.Frame, path_icon: os.path) -> None:
         TaskBarIcon.__init__(self)
         self.frame = frame
-        self.SetIcon(wx.Icon('change-printer.png',
+        self.SetIcon(wx.Icon(path_icon,
                      wx.BITMAP_TYPE_PNG), 'Task bar icon')
         # Variable to indicate if program is running or not
         self.running = False
@@ -66,14 +66,14 @@ class TaskBar(TaskBarIcon):
 
 class GUI (wx.Frame):
 
-    def __init__(self, parent):
+    def __init__(self, parent, path_icon: os.path) -> None:
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=u"GIP",
                           pos=wx.DefaultPosition, size=wx.Size(722, 335),
                           style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
-        self.SetIcon(wx.Icon('change-printer.png', wx.BITMAP_TYPE_PNG))
+        self.SetIcon(wx.Icon(path_icon, wx.BITMAP_TYPE_PNG))
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
         # ----------------------------------------------------------------
-        self.tskic = TaskBar(self)
+        self.tskic = TaskBar(self, path_icon)
         # ----------------------------------------------------------------
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         # ----------------------------------------------------------------
@@ -256,6 +256,6 @@ class GUI (wx.Frame):
 
 if __name__ == '__main__':
     app = wx.App()
-    frame = GUI(None)
+    frame = GUI(None, os.path.join(os.path.join(os.getcwd(), 'change-printer.png')))
     frame.Show()
     app.MainLoop()
