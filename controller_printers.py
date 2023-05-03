@@ -43,7 +43,7 @@ class PrinterController:
         self.task = None
         self.printer = Printer()  # declaração da model printer
         self.app = wx.App()  # criação da interface gráfica
-        self.frame = GUI(None)  # chamada da interface gráfica
+        self.frame = GUI(None,  os.path.join(os.path.join(os.getcwd(), 'change-printer.png')))  # chamada da interface gráfica
 
         # preenche a lista de impressoras do sistema
         self.frame.m_choice2.SetItems(
