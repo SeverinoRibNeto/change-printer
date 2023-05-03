@@ -1,8 +1,9 @@
-import win32print
-import win32gui
-import win32process
-import win32con
 import win32api
+import win32con
+import win32gui
+import win32print
+import win32process
+import contextlib
 import psutil
 import os
 from typing import List
@@ -29,31 +30,36 @@ class Printer:
         # define a nova impressora padrão
         win32print.SetDefaultPrinter(nome_impressora_padrao)
         return True
-    
-    def janela_esta_ativa(self, nome_processo:str)->bool:
-        #verifica a janela ativa
-        janela_ativa = win32gui.GetForegroundWindow()
-        #obter id do processo a partir do identificador da janela
-        pid = win32process.GetWindowThreadProcessId(janela_ativa)[1]
 
-        #obtem o handler do processo a partir do identificador
-        handle = win32api.OpenProcess(win32con.PROCESS_QUERY_INFORMATION | win32con.PROCESS_VM_READ, 
-                                          False, 
-                                          pid)
+    def janela_esta_ativa(self, nome_processo: str) -> bool:
+        try:
+            # Verifica a janela ativa
+            janela_ativa = win32gui.GetForegroundWindow()
 
-        #obter nome do executavel do processo a partir do handle
-        exe_file = win32process.GetModuleFileNameEx(handle, 0)
+            # Obter id do processo a partir do identificador da janela
+            pid = win32process.GetWindowThreadProcessId(janela_ativa)[1]
 
-        print(exe_file)
-        process_name = psutil.Process(pid).name()
-        print("Nome do processo da janela ativa:", process_name)
-        if process_name.upper() == nome_processo.upper():
-            return True
-        
-        return False
-    
-    def pegar_nome_processo(self, caminho_processo:str) -> str:
-        return os.path.basename(caminho_processo).upper() #Retorna o nome do processo pelo caminho
+            # Obtem o handler do processo a partir do identificador
+            with contextlib.closing(win32api.OpenProcess(
+                win32con.PROCESS_QUERY_INFORMATION | win32con.PROCESS_VM_READ,
+                False,
+                pid
+            )) as handle:
+
+                # Obter nome do executavel do processo a partir do handle
+                exe_file = win32process.GetModuleFileNameEx(handle, 0)
+
+            process_name = psutil.Process(pid).name()
+
+            return process_name.upper() == nome_processo.upper()
+
+        except Exception:
+            # Tratamento de exceções
+            return False
+
+    def pegar_nome_processo(self, caminho_processo: str) -> str:
+        # Retorna o nome do processo pelo caminho
+        return os.path.basename(caminho_processo).upper()
 
 
 if __name__ == "__main__":
