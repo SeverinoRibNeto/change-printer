@@ -1,10 +1,10 @@
-import win32print
-import win32gui
-import time
-import pystray
-
-impressoras = win32print.EnumPrinters(win32print.PRINTER_ENUM_LOCAL, None, 1) #Obtem listas de impressoras no sistema
+from controller_printers import PrinterController
 
 
-current_print = win32print.GetDefaultPrinter()
-print(current_print)
+def main():
+    printer = PrinterController()
+    printer.run()
+
+
+if __name__ == "__main__":
+    main()
