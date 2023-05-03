@@ -22,40 +22,42 @@ class TaskBar(TaskBarIcon):
         self.frame = frame
         self.SetIcon(wx.Icon('change-printer.png',
                      wx.BITMAP_TYPE_PNG), 'Task bar icon')
+        # Variable to indicate if program is running or not
+        self.running = False
 
         # ----------------------------------------------------------------
-        self.Bind(wx.EVT_MENU, self.OnTaskBarActivate, id=1)
-        self.Bind(wx.EVT_MENU, self.OnTaskBarDeactivate, id=2)
-        self.Bind(wx.EVT_MENU, self.OnTaskBarClose, id=3)
-        self.Bind(wx.EVT_MENU, self.OnTaskBarStart, id=4)
-        self.Bind(wx.EVT_MENU, self.OnTaskBarStop, id=5)
+        self.Bind(wx.EVT_MENU, self.OnTaskBarActivateDeactivate, id=1)
+        self.Bind(wx.EVT_MENU, self.OnTaskBarClose, id=2)
+        self.Bind(wx.EVT_MENU, self.OnTaskBarStartStop, id=3)
 
+# Create a popup menu and items
     def CreatePopupMenu(self):
         menu = wx.Menu()
-        menu.Append(1, "Mostrar")
-        menu.Append(2, "Esconder")
-        menu.Append(3, "Fechar")
-        menu.Append(4, "Iniciar")
-        menu.Append(5, "Parar")
+        menu.Append(1, "Mostrar/Esconder")
+        menu.Append(2, "Fechar")
+        menu.Append(3, "Iniciar/Parar")
+
         return menu
 
-    def OnTaskBarActivate(self, event):
+# Create function to show or hide a windows if frame.
+    def OnTaskBarActivateDeactivate(self, event):
         if (not self.frame.IsShown()):
             self.frame.Show()
-
-    def OnTaskBarDeactivate(self, event):
-        if (self.frame.IsShown()):
+        elif (self.frame.IsShown()):
             self.frame.Hide()
 
+# Function close the program
     def OnTaskBarClose(self, event):
         self.frame.Close()
 
-    def OnTaskBarStop(self, event):
-        pub.sendMessage("Stop_Pressed")
-
-    def OnTaskBarStart(self, event):
-        pub.sendMessage("Stop_Pressed")
-
+# Function start script or stop depending on value of running
+    def OnTaskBarStartStop(self, event):
+        if not (self.running):
+            self.running = True
+            pub.sendMessage("Start_Pressed")
+        else:
+            self.running = False
+            pub.sendMessage("Stop_Pressed")
 
 ###########################################################################
 # Class GUI
@@ -85,7 +87,9 @@ class GUI (wx.Frame):
                                                     printer_message,
                                                     caption="Error",
                                                     style=wx.OK_DEFAULT)
-
+        # ----------------------------------------------------------------
+        self.running = False
+        # ----------------------------------------------------------------
         bSizer1 = wx.BoxSizer(wx.VERTICAL)
 
         self.m_staticText3 = wx.StaticText(
@@ -152,17 +156,24 @@ class GUI (wx.Frame):
 
         gSizer1.Add(self.loadConfBtn, 0, wx.ALL, 5)
 
-        self.startBtn = wx.Button(
-            self, wx.ID_ANY, u"Iniciar", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.startBtn.SetMinSize(wx.Size(150, 40))
+        self.start_stopBtn = wx.Button(self,
+                                       wx.ID_ANY,
+                                       u"Iniciar / Parar",
+                                       wx.DefaultPosition,
+                                       wx.DefaultSize,
+                                       0)
+        self.start_stopBtn.SetMinSize(wx.Size(150, 40))
 
-        gSizer1.Add(self.startBtn, 0, wx.ALL, 5)
+        gSizer1.Add(self.start_stopBtn, 0, wx.ALL, 5)
 
-        self.pararBtn = wx.Button(
-            self, wx.ID_ANY, u"Parar", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.pararBtn.SetMinSize(wx.Size(150, 40))
+        self.hideBtn = wx.Button(self,
+                                 wx.ID_ANY,
+                                 u"Esconder",
+                                 wx.DefaultPosition,
+                                 wx.DefaultSize, 0)
+        self.hideBtn.SetMinSize(wx.Size(150, 40))
 
-        gSizer1.Add(self.pararBtn, 0, wx.ALL | wx.ALIGN_RIGHT, 5)
+        gSizer1.Add(self.hideBtn, 0, wx.ALL | wx.ALIGN_RIGHT, 5)
 
         bSizer1.Add(gSizer1, 0, wx.EXPAND, 5)
 
@@ -190,8 +201,8 @@ class GUI (wx.Frame):
         # Connect Events
         self.saveConfBtn.Bind(wx.EVT_BUTTON, self.saveConfig)
         self.loadConfBtn.Bind(wx.EVT_BUTTON, self.loadConfig)
-        self.startBtn.Bind(wx.EVT_BUTTON, self.start)
-        self.pararBtn.Bind(wx.EVT_BUTTON, self.stop)
+        self.start_stopBtn.Bind(wx.EVT_BUTTON, self.start_stop)
+        self.hideBtn.Bind(wx.EVT_BUTTON, self.hide)
 
     def __del__(self):
         pass
@@ -218,22 +229,28 @@ class GUI (wx.Frame):
         pub.sendMessage("Load_Config_Pressed")
         event.Skip()
 
-    def start(self, event) -> None:
+    def start_stop(self, event) -> None:
         if not (self.m_choice2.GetStringSelection()):
             self.message_box_printer.ShowModal()
             return
 
-        if not (self.m_filePicker1.GetPath()):
+        elif not (self.m_filePicker1.GetPath()):
             self.message_box_program.ShowModal()
             return
 
-        pub.sendMessage("Start_Pressed",
-                        caminho=self.m_filePicker1.GetPath(),
-                        impressora=self.m_choice2.GetStringSelection())
+        if not (self.running):
+            self.running = True
+            pub.sendMessage("Start_Pressed",
+                            caminho=self.m_filePicker1.GetPath(),
+                            impressora=self.m_choice2.GetStringSelection())
+        elif (self.running):
+            self.running = False
+            pub.sendMessage("Stop_Pressed")
         event.Skip()
 
-    def stop(self, event):
-        pub.sendMessage("Stop_Pressed")
+    def hide(self, event):
+        if (self.IsShown()):
+            self.Hide()
         event.Skip()
 
 
